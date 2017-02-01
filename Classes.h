@@ -1,6 +1,6 @@
 //Blackjack program classes
 //Tyler Knapp
-//Last Updated: 8/26/2016
+//Last Updated: 1/24/2017
 
 #pragma once
 #include<iostream>
@@ -23,8 +23,6 @@ private:
 	string number;
 	string suit;
 	string appearence = number + " of " + suit;
-
-
 
 public:
 	//Constructor
@@ -116,9 +114,9 @@ class deck
 {
 private:
 	//Properties
-	const int number_of_cards = 52; //size of deck
+	const int starting_number_of_cards = 52; //size of deck
+	int current_number_of_cards; //How many cards are now in the deck
 	vector<card> cards; //cards in the deck
-
 						//Arrays used to translate int deck values to readable strings
 	string suits[4] = { "Clubs","Spades","Diamonds","Hearts" };
 	string ranks[13] = { "A","2","3","4","5","6","7","8","9","10","J","Q","K" };
@@ -129,9 +127,10 @@ public:
 		vector<int> card_index; //int values indexing cards
 		vector<int> card_values; //vector containing values of cards
 		vector<string> card_suits; //vector containing appearences of cards
+		current_number_of_cards = starting_number_of_cards; //Setting numbner of cards to start at 52
 
 								   //initializing index of deck
-		for (int i = 0; i < number_of_cards; i++)
+		for (int i = 0; i < starting_number_of_cards; i++)
 		{
 			card_index.push_back(i);
 		}
@@ -153,7 +152,7 @@ public:
 
 		//initializing appearences of deck
 		//Returning string in form "'number' of 'suit'"
-		for (int i = 0; i < number_of_cards; i++)
+		for (int i = 0; i < starting_number_of_cards; i++)
 		{
 			suit = suits[i / 13];
 			card_suits.push_back(value);
@@ -161,7 +160,7 @@ public:
 
 		//setting up the deck full of cards with correct values
 		card holder;
-		for (int i = 0; i < number_of_cards; i++)
+		for (int i = 0; i < starting_number_of_cards; i++)
 		{
 			holder.set_value(card_values[i]);
 			holder.set_index(card_index[i]);
@@ -184,29 +183,39 @@ public:
 		//Erasing drawn card from deck
 		cards.erase(cards.begin() + (num - 1));
 
-
 		return dealt_card;
 	}
+
+	void set_current_number_of_cards(int x)
+	{
+		current_number_of_cards = x;
+	}
+	int get_current_number_of_cards()
+	{
+		return current_number_of_cards;
+	}
+	
+	int get_starting_number_of_cards()
+	{
+		return starting_number_of_cards;
+	}
+
 
 };
 
 
-//A player's hand
+//A hand of cards
 class hand
 {
 private:
 	//Properties:
 	vector<card> cards_held;
-	deck current_deck;
 public:
 	//Constructor:
 	//(Dealing a new hand)
 	hand()
 	{
-		for (int i = 0; i < 6; i++)
-		{
-			cards_held.push_back(current_deck.deal());
-		}
+
 	}
 
 	//Actions:
@@ -226,6 +235,21 @@ public:
 		{
 			cout << cards_held[i].get_appearence() << endl;
 		}
+	}
+
+	int get_total()
+	{
+		int total = 0;
+		for (int i = 0; i < cards_held.size(); i++)
+		{
+			total += cards_held[i].get_value();
+		}
+		return total;
+	}
+
+	void add_card(deck current_deck)
+	{
+		cards_held.push_back(current_deck.deal());
 	}
 };
 
@@ -252,22 +276,32 @@ public:
 		return current_hand.play_card(choice);
 	}
 
-	void show_current_hand()
+	void give_card(deck current_deck)
+	{
+		current_hand.add_card(current_deck);
+	}
+
+	int get_hand_total() //get total value of player's hand
+	{
+		return current_hand.get_total();
+	}
+
+	void show_current_hand()//shows players hand
 	{
 		current_hand.show_cards_held();
 	}
 
-	int get_points()
+	int get_points()//returns players points (chips ect...)
 	{
 		return points;
 	}
 
-	void set_name(string new_name)
+	void set_name(string new_name) //Change player name
 	{
 		name = new_name;
 	}
 
-	string get_name()
+	string get_name() //get players name
 	{
 		return name;
 	}
